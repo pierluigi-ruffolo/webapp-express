@@ -1,5 +1,15 @@
+import connection from "../database/dbConnection.js";
+
 function index(req, res) {
-  res.send("sono index");
+  const sql = "SELECT * FROM `movies`";
+  connection.query(sql, (error, result) => {
+    if (error) {
+      return res.status(500).json({
+        message: "Error Server",
+      });
+    }
+    res.json(result);
+  });
 }
 
 function show(req, res) {
