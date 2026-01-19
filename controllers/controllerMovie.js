@@ -1,25 +1,21 @@
 import connection from "../database/dbConnection.js";
 
-function index(req, res) {
+function index(req, res, next) {
   const sql = "SELECT * FROM `movies`";
   connection.query(sql, (error, result) => {
     if (error) {
-      return res.status(500).json({
-        message: "Error Server",
-      });
+      return next(error);
     }
     res.json(result);
   });
 }
 
-function show(req, res) {
+function show(req, res, next) {
   const id = req.params.id;
   const sqlMovies = "SELECT * FROM `movies` WHERE `movies`.`id` = ?";
   connection.query(sqlMovies, [id], (error, resultMovies) => {
     if (error) {
-      return res.status(500).json({
-        message: "Error Server",
-      });
+      return next(error);
     }
     if (resultMovies.length === 0) {
       return res.status(404).json({
@@ -31,9 +27,7 @@ function show(req, res) {
     const sqlReviews = "SELECT * FROM `reviews` WHERE `reviews`.`movie_id` = ?";
     connection.query(sqlReviews, [id], (error, resultReviews) => {
       if (error) {
-        return res.status(500).json({
-          message: "Error Server",
-        });
+        return next(error);
       }
       const response = {
         ...movies,
