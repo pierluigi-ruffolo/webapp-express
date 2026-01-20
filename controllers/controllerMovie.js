@@ -1,7 +1,8 @@
 import connection from "../database/dbConnection.js";
 
 function index(req, res, next) {
-  const sql = "SELECT * FROM `movies`";
+  const sql =
+    "select movies.*, avg(reviews.vote) as vote_movie from movies inner join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
   connection.query(sql, (error, result) => {
     if (error) {
       return next(error);
