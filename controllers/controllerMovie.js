@@ -1,14 +1,32 @@
 import connection from "../database/dbConnection.js";
 
 function index(req, res, next) {
-  const sql =
-    "select movies.*, avg(reviews.vote) as vote_movie from movies inner join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
-  connection.query(sql, (error, result) => {
-    if (error) {
-      return next(error);
-    }
-    res.json(result);
-  });
+  const title = `${req.query.title}%`;
+  if (title === undefined) {
+    const sql =
+      "select movies.*, avg(reviews.vote) as vote_movie from movies inner join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
+    connection.query(sql, (error, result) => {
+      if (error) {
+        return next(error);
+      }
+      res.json(result);
+    });
+  } else {
+    const sqlTitle =
+      "select movies.*, avg(reviews.vote) as vote_movie from movies left join reviews on movies.id = reviews.movie_id GROUP BY movies.id having movies.title Like ?";
+    connection.query(sqlTitle, [title], (error, resultTitle) => {
+      if (error) {
+        return next(error);
+      }
+      if (resultTitle.length === 0) {
+        return res.status(404).json({
+          message: "Risorsa Non trovata",
+          error: "NOT FOUND",
+        });
+      }
+      res.json(resultTitle);
+    });
+  }
 }
 
 function show(req, res, next) {

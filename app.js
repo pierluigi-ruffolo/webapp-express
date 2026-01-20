@@ -9,7 +9,7 @@ const port = process.env.SERVER_PORT;
 app.use(express.static("public"));
 app.use(
   cors({
-    origin: "",
+    origin: "http://localhost:5174",
   }),
 );
 app.use(express.json());
