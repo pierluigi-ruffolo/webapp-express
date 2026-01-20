@@ -1,7 +1,7 @@
 import connection from "../database/dbConnection.js";
 
 function index(req, res, next) {
-  const title = `${req.query.title}%`;
+  const title = req.query.title;
   if (title === undefined) {
     const sql =
       "select movies.*, avg(reviews.vote) as vote_movie from movies inner join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
@@ -12,9 +12,10 @@ function index(req, res, next) {
       res.json(result);
     });
   } else {
+    const sqlLink = `${title}%`;
     const sqlTitle =
       "select movies.*, avg(reviews.vote) as vote_movie from movies left join reviews on movies.id = reviews.movie_id GROUP BY movies.id having movies.title Like ?";
-    connection.query(sqlTitle, [title], (error, resultTitle) => {
+    connection.query(sqlTitle, [sqlLink], (error, resultTitle) => {
       if (error) {
         return next(error);
       }
