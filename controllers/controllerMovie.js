@@ -4,7 +4,7 @@ function index(req, res, next) {
   const title = req.query.title;
   if (title === undefined) {
     const sql =
-      "select movies.*, avg(reviews.vote) as vote_movie from movies inner join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
+      "select movies.*, avg(reviews.vote) as vote_movie from movies left  join reviews on movies.id = reviews.movie_id GROUP BY movies.id";
     connection.query(sql, (error, result) => {
       if (error) {
         return next(error);
@@ -20,10 +20,7 @@ function index(req, res, next) {
         return next(error);
       }
       if (resultTitle.length === 0) {
-        return res.status(404).json({
-          message: "Risorsa Non trovata",
-          error: "NOT FOUND",
-        });
+        return res.json(resultTitle);
       }
       res.json(resultTitle);
     });
