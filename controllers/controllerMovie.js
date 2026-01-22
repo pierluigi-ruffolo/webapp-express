@@ -19,9 +19,6 @@ function index(req, res, next) {
       if (error) {
         return next(error);
       }
-      if (resultTitle.length === 0) {
-        return res.json(resultTitle);
-      }
       res.json(resultTitle);
     });
   }
@@ -34,7 +31,7 @@ function show(req, res, next) {
     if (error) {
       return next(error);
     }
-    console.log(resultMovies);
+
     if (resultMovies.length === 0) {
       return res.status(404).json({
         message: "Risorsa Non trovata",
@@ -56,10 +53,52 @@ function show(req, res, next) {
     });
   });
 }
+/* store reviews */
+function storeReviews(req, res, next) {
+  const id = req.params.id;
+  const { name, vote, text } = req.body;
+  const sqlSearchMovie = "SELECT * FROM `movies` WHERE movies.id = ?";
+  connection.query(sqlSearchMovie, [id], (err, resultMovie) => {
+    if (err) return rext(err);
+    if (resultMovie.length === 0) {
+      return res.status(404).json({
+        message: "Impossibile aggiungere una recensione: film non trovato.",
+        error: "NOT FOUND",
+      });
+    }
+    if (
+      name === undefined ||
+      name === "" ||
+      vote === undefined ||
+      vote < 0 ||
+      vote > 5
+    ) {
+      return res.status(400).json({
+        message:
+          "I dati inviati non sono validi. Assicurati che il nome sia presente e che il voto sia compreso tra 0 e 5.",
+        error: "INVALID",
+      });
+    }
+    const sqlInsertReviews =
+      "INSERT INTO `reviews`(movie_id, name, vote, text) values (?, ?, ?, ?)";
+    connection.query(
+      sqlInsertReviews,
+      [id, name, vote, text],
+      (error, results) => {
+        if (error) return next(error);
+        return res.status(201).json({
+          message: "reviews creata correttamente",
+          id: results.insertId,
+        });
+      },
+    );
+  });
+}
 
 const controller = {
   index,
   show,
+  storeReviews,
 };
 
 export default controller;
