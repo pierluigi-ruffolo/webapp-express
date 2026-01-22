@@ -1,5 +1,5 @@
 import connection from "../database/dbConnection.js";
-
+/* index  */
 function index(req, res, next) {
   const title = req.query.title;
   if (title === undefined) {
@@ -26,14 +26,15 @@ function index(req, res, next) {
     });
   }
 }
-
+/* show */
 function show(req, res, next) {
-  const id = req.params.id;
-  const sqlMovies = "SELECT * FROM `movies` WHERE `movies`.`id` = ?";
-  connection.query(sqlMovies, [id], (error, resultMovies) => {
+  const slug = req.params.slug;
+  const sqlMovies = "SELECT * FROM `movies` WHERE `movies`.`slug` = ?";
+  connection.query(sqlMovies, [slug], (error, resultMovies) => {
     if (error) {
       return next(error);
     }
+    console.log(resultMovies);
     if (resultMovies.length === 0) {
       return res.status(404).json({
         message: "Risorsa Non trovata",
@@ -42,7 +43,7 @@ function show(req, res, next) {
     }
     const movies = resultMovies[0];
     const sqlReviews = "SELECT * FROM `reviews` WHERE `reviews`.`movie_id` = ?";
-    connection.query(sqlReviews, [id], (error, resultReviews) => {
+    connection.query(sqlReviews, [movies.id], (error, resultReviews) => {
       if (error) {
         return next(error);
       }

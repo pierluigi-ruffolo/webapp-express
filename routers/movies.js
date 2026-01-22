@@ -7,6 +7,6 @@ const { index, show } = controllerMovie;
 /* INDEX */
 router.get("/", index);
 /* show */
-router.get("/:id", show);
+router.get("/:slug", show);
 
 export default router;
