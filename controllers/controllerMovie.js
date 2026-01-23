@@ -56,7 +56,7 @@ function show(req, res, next) {
 }
 
 function store(req, res, next) {
-  const { title, director, genre, release_year, abstract } = req.body;
+  const { title, director, genre, release, abstract } = req.body;
   if (title === undefined || title === "") {
     return res.status(400).json({
       message: "Titolo necessario",
@@ -73,13 +73,12 @@ function store(req, res, next) {
     "INSERT INTO `movies`(slug, title, director, genre, release_year,  abstract, image) VALUES (?,?,?,?,?,?,?)";
   connection.query(
     sql,
-    [slug, title, director, genre, release_year, abstract, nameImage],
+    [slug, title, director, genre, release, abstract, nameImage],
     (error, resalt) => {
       if (error) return next(error);
-
-      return res.json({
+      return res.status(201).json({
         message: "film creato",
-        id: resalt.inserId,
+        resalt: slug,
       });
     },
   );
