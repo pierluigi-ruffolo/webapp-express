@@ -1,4 +1,5 @@
 import connection from "../database/dbConnection.js";
+import slugify from "slugify";
 /* index  */
 function index(req, res, next) {
   const title = req.query.title;
@@ -53,6 +54,37 @@ function show(req, res, next) {
     });
   });
 }
+
+function store(req, res, next) {
+  const { title, director, genre, release_year, abstract } = req.body;
+  if (title === undefined || title === "") {
+    return res.status(400).json({
+      message: "Titolo necessario",
+    });
+  }
+
+  const slug = slugify(title, {
+    replacement: "-",
+    lower: true,
+    strict: true,
+  });
+  const nameImage = req.file === undefined ? null : req.file.filename;
+  const sql =
+    "INSERT INTO `movies`(slug, title, director, genre, release_year,  abstract, image) VALUES (?,?,?,?,?,?,?)";
+  connection.query(
+    sql,
+    [slug, title, director, genre, release_year, abstract, nameImage],
+    (error, resalt) => {
+      if (error) return next(error);
+
+      return res.json({
+        message: "film creato",
+        id: resalt.inserId,
+      });
+    },
+  );
+}
+
 /* store reviews */
 function storeReviews(req, res, next) {
   const id = req.params.id;
@@ -98,6 +130,7 @@ function storeReviews(req, res, next) {
 const controller = {
   index,
   show,
+  store,
   storeReviews,
 };
 
